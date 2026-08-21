@@ -2745,7 +2745,7 @@ onMounted(() => {
               <el-switch v-model="waterSetting.enable" style="--el-switch-on-color: #13ce66;" />
             </div>
             <div v-if="waterSetting.enable" class="water-setting">
-              <el-input v-model="waterSetting.text" :rows="2" type="textarea" placeholder="Design by 小仙女" />
+              <el-input v-model="waterSetting.text" :rows="2" type="textarea" placeholder="Design by HaipHub" />
               <div class="line">
                 <div class="item">
                   <div>X</div>
@@ -2828,7 +2828,7 @@ onMounted(() => {
             <el-switch v-model="waterSetting.enable" style="--el-switch-on-color: #13ce66;" />
           </div>
           <div v-if="waterSetting.enable" class="water-setting">
-            <el-input v-model="waterSetting.text" :rows="2" type="textarea" placeholder="Design by 小仙女" />
+            <el-input v-model="waterSetting.text" :rows="2" type="textarea" placeholder="Design by HaipHub" />
             <div class="line">
               <div class="item">
                 <div>X</div>
