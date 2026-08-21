@@ -1634,7 +1634,7 @@ const formatDateIntl = (date, locale) => {
 
 let formatedDate = (date) => {
   if (locale.value == 'zh') {
-    return `${date.getMonth() + 1}月${date.getDate()}日 星期${formatXingQi(date.getDay())}`
+    return `${date.getMonth() + 1}月${date.getDate()}日周${formatXingQi(date.getDay())}`
   } else {
     return formatDateIntl(date, locale.value)
   }

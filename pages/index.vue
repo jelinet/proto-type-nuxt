@@ -22,13 +22,13 @@ const showAlert = ref(
 
 const leadingsText = computed(() => [
   {
-    text: 'Helps wallpaper creators',
+    text: '帮助壁纸创作者',
     startColor: '#007CF0',
     endColor: '#00DFD8',
     delay: 0,
   },
   {
-    text: 'Quickly generate realistic device mockups',
+    text: '快速生成逼真的设备样机',
     startColor: '#7928CA',
     endColor: '#FF0080',
     delay: 2,
@@ -55,7 +55,7 @@ onMounted(() => {
         </span>
       </h1>
       <div class="flex space-x-4 ml-2 mt-8 justify-center md:justify-start">
-        <Button size="lg" text="Get started" :to="localePath('/mockup')" class="font-extrabold" />
+        <Button size="lg" text="立即开始" :to="localePath('/mockup')" class="font-extrabold" />
       </div>
 
       <section class="py-10 text-card-foreground">
@@ -63,13 +63,13 @@ onMounted(() => {
           <div class="mt-12 grid grid-cols-1 gap-8">
             <div class="grid items-center gap-8 rounded-2xl border bg-card/50 p-8 lg:p-12 lg:grid-cols-2 lg:gap-16">
               <div class="overflow-hidden rounded-xl bg-primary/10">
-                <img src="/images/introduce-1.png" alt="Feature 1" class="block object-cover" />
+                <img src="/images/introduce-1.png" alt="多设备样机支持" class="block object-cover" />
               </div>
 
               <div>
-                <h3 class="font-bold text-4xl">Multi-device mockup support</h3>
+                <h3 class="font-bold text-4xl">多设备样机支持</h3>
                 <p class="mt-5 text-foreground/60 leading-normal">
-                  Covers iPhone, iPad, Mac, and more to meet diverse display needs
+                  覆盖 iPhone、iPad、Mac 等多种设备，满足多样化展示需求
                 </p>
               </div>
             </div>
