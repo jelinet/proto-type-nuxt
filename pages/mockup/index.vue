@@ -3820,8 +3820,8 @@ video {
 
         .carrier-text {
           position: absolute;
-          top: 3px;
-          left: 32px;
+          top: 12px;
+          left: 16px;
           line-height: 1;
           font-size: 16px;
           white-space: nowrap;
