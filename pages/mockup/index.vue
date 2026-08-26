@@ -2351,8 +2351,8 @@ onMounted(() => {
                       <svg width="390" height="53" viewBox="0 0 390 53" transform="translate(-6 -5)"
                         :fill="proto.screenType == '聊天' ? '#000000' : proto.systemColor"
                         xmlns="http://www.w3.org/2000/svg">
-                        <rect opacity="0.35" x="337.172" y="22.5" width="24" height="12" rx="3" stroke="#25E11E"
-                          fill="transparent"></rect>
+                        <rect opacity="0.35" x="337.172" y="22.5" width="24" height="12" rx="3"
+                          :stroke="proto.screenType == '聊天' ? '#000000' : proto.systemColor" fill="transparent"></rect>
                         <path opacity="0.4"
                           d="M362.672 26.666V30.666C363.477 30.3272 364 29.5391 364 28.666C364 27.7929 363.477 27.0048 362.672 26.666Z">
                         </path>
