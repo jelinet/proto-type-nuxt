@@ -30,8 +30,12 @@ const boundlessThreeImage = '/image/proto/boundless-three.png'
 const boundlessFourImage = '/image/proto/boundless-four.png'
 const seamlessImage = '/image/proto/seamless.png'
 const boundlessFiveImage = '/image/proto/boundless-five.png'
+const boundlessSixImage = '/image/proto/boundless-six.png'
+const boundlessSevenImage = '/image/proto/boundless-seven.png'
 const eightDevicesImage = '/image/proto/eight-devices.png'
+const eightDevices34Image = '/image/proto/eight-devices-34.png'
 const tenDevicesImage = '/image/proto/ten-devices.png'
+const tenDevices34Image = '/image/proto/ten-devices-34.png'
 const magazineImage = '/image/proto/magazine.png'
 const magazineBackgroundImage = '/image/background/magazine.jpg'
 const standImage = '/image/proto/stand.png'
@@ -139,6 +143,11 @@ function changeProtoWidth() {
   let windowWidth = window.innerWidth
   let windowHeight = window.innerHeight
 
+  // 画布尺寸跟随当前选中的模板，未指定时使用默认的 1200x1600
+  let canvasWidth = (selectedProto.value && selectedProto.value.canvasWidth) || 1200
+  let canvasHeight = (selectedProto.value && selectedProto.value.canvasHeight) || 1600
+  let canvasRatio = canvasHeight / canvasWidth
+
   // 判断是横屏还是竖屏
   isVerticalScreen.value = windowWidth < windowHeight
 
@@ -151,22 +160,22 @@ function changeProtoWidth() {
       w.value = maxWidth
     }
 
-    h.value = w.value * 4 / 3;
+    h.value = w.value * canvasRatio;
 
 
-    let s = w.value / 1200
+    let s = w.value / canvasWidth
 
     scale.value = `scale(${s})`
   } else {
     let maxWidth = windowWidth - 328 - 320 - 32;
     let maxHeight = windowHeight - 50 - 60 - 68;
-    let maxHeightToWidth = maxHeight * 3 / 4;
+    let maxHeightToWidth = maxHeight / canvasRatio;
 
     w.value = maxWidth > maxHeightToWidth ? maxHeightToWidth : maxWidth;
 
-    h.value = w.value * 4 / 3;
+    h.value = w.value * canvasRatio;
 
-    let s = w.value / 1200
+    let s = w.value / canvasWidth
 
     scale.value = `scale(${s})`
   }
@@ -420,7 +429,7 @@ function makeGridProto(positions, { defaultScale = 1, frame = true, smartIsLand 
         width: '426px',
         height: '877px',
         transform: `rotate(${rotate}deg) translateX(${pos.x}px) translateY(${pos.y}px) scaleX(${scale}) scaleY(${scale}) perspective(none) skewX(0deg) skewY(0deg) rotateX(0deg) rotateY(0deg) rotateZ(0deg)`,
-        ...(shadow ? { filter: 'drop-shadow(rgba(0, 0, 0, 0.35) -8px 8px 16px)' } : {})
+        ...(shadow ? { filter: 'drop-shadow(rgba(0, 0, 0, 0.4) -10px 5px 20px)' } : {})
       },
       paperStyleMethod: (proto) => {
         return "width: calc(100% - 36px);height: calc(100% - 32px); border-radius: 50px;position: absolute;left: 18px;top: 16px;"
@@ -493,6 +502,8 @@ function protoChange(proto) {
   if (autoUpdate.value) {
     backgroundUrl.value = paperUrl.value
   }
+
+  changeProtoWidth()
 }
 
 let defaultSystemColor = "#ffffff"
@@ -984,21 +995,23 @@ let protoTypeList = ref([
         }
       },
       {
+        // 精确复刻参考站"无界3"：canvas 1200x1600，3台并排，无边框，无阴影
         defaultProtoUrl: boundlessThreeImage,
         exampleName: t("mockup.boundlessThree"),
         protoList: makeGridProto([
-          { x: -330, y: 20, rotate: -8, scale: 0.9 },
-          { x: 330, y: 20, rotate: 8, scale: 0.9 },
-          { x: 0, y: -15, rotate: 0, scale: 1.0 },
-        ], { frame: false, smartIsLand: false, shadow: true }),
+          { x: -385, y: 0, scale: 0.900798 },
+          { x: 0, y: 0, scale: 0.900798 },
+          { x: 385, y: 0, scale: 0.900798 },
+        ], { frame: false, smartIsLand: false, shadow: false }),
         background: makeGridBackground()
       },
       {
+        // 精确复刻参考站"无界4"：canvas 1200x1600，3列x2行网格，无边框，无阴影
         defaultProtoUrl: boundlessFourImage,
         exampleName: t("mockup.boundlessFour"),
         protoList: makeGridProto(
-          gridPositions([-400, 0, 400], [-400, 400]),
-          { defaultScale: 0.85, frame: false, smartIsLand: false, shadow: true }
+          gridPositions([-380, 0, 380], [-380, 380]),
+          { defaultScale: 0.855188, frame: false, smartIsLand: false, shadow: false }
         ),
         background: makeGridBackground()
       },
@@ -1021,20 +1034,74 @@ let protoTypeList = ref([
         background: makeGridBackground()
       },
       {
-        defaultProtoUrl: eightDevicesImage,
-        exampleName: t("mockup.eightDevices"),
+        // 精确复刻参考站"无界6"：canvas 900x1600，3列x3行网格，无边框，无阴影
+        defaultProtoUrl: boundlessSixImage,
+        exampleName: t("mockup.boundlessSix"),
+        canvasWidth: 900,
+        canvasHeight: 1600,
         protoList: makeGridProto(
-          gridPositions([-450, -150, 150, 450], [-400, 400]),
-          { defaultScale: 0.6, frame: true, smartIsLand: true }
+          gridPositions([-280, 0, 280], [-520, 0, 520]),
+          { defaultScale: 0.592934, frame: false, smartIsLand: false, shadow: false }
         ),
         background: makeGridBackground()
       },
       {
+        // 精确复刻参考站"无界7"：canvas 900x1600，2列x2行网格，无边框，无阴影
+        defaultProtoUrl: boundlessSevenImage,
+        exampleName: t("mockup.boundlessSeven"),
+        canvasWidth: 900,
+        canvasHeight: 1600,
+        protoList: makeGridProto(
+          gridPositions([-200, 200], [-380, 380]),
+          { defaultScale: 0.855188, frame: false, smartIsLand: false, shadow: false }
+        ),
+        background: makeGridBackground()
+      },
+      {
+        // 精确复刻参考站"8设备"：canvas 1600x1600（正方形），4列x2行网格，无边框，带阴影
+        defaultProtoUrl: eightDevicesImage,
+        exampleName: t("mockup.eightDevices"),
+        canvasWidth: 1600,
+        canvasHeight: 1600,
+        protoList: makeGridProto(
+          gridPositions([-585, -195, 195, 585], [-386, 386]),
+          { defaultScale: 0.892019, frame: false, smartIsLand: false, shadow: true }
+        ),
+        background: makeGridBackground()
+      },
+      {
+        // 精确复刻参考站"8设备(3:4)"：跟"8设备"手机位置完全相同，只是画布换成 1600x2133.33（3:4）
+        defaultProtoUrl: eightDevices34Image,
+        exampleName: t("mockup.eightDevices34"),
+        canvasWidth: 1600,
+        canvasHeight: 2133.33,
+        protoList: makeGridProto(
+          gridPositions([-585, -195, 195, 585], [-386, 386]),
+          { defaultScale: 0.892019, frame: false, smartIsLand: false, shadow: true }
+        ),
+        background: makeGridBackground()
+      },
+      {
+        // 精确复刻参考站"10设备"：canvas 1600x1600（正方形），5列x2行网格，无边框，带阴影
         defaultProtoUrl: tenDevicesImage,
         exampleName: t("mockup.tenDevices"),
+        canvasWidth: 1600,
+        canvasHeight: 1600,
         protoList: makeGridProto(
-          gridPositions([-480, -240, 0, 240, 480], [-400, 400]),
-          { defaultScale: 0.48, frame: true, smartIsLand: true }
+          gridPositions([-620, -310, 0, 310, 620], [-320, 320]),
+          { defaultScale: 0.704225, frame: false, smartIsLand: false, shadow: true }
+        ),
+        background: makeGridBackground()
+      },
+      {
+        // 精确复刻参考站"10设备(3:4)"：跟"10设备"手机位置完全相同，只是画布换成 1600x2133.33（3:4）
+        defaultProtoUrl: tenDevices34Image,
+        exampleName: t("mockup.tenDevices34"),
+        canvasWidth: 1600,
+        canvasHeight: 2133.33,
+        protoList: makeGridProto(
+          gridPositions([-620, -310, 0, 310, 620], [-320, 320]),
+          { defaultScale: 0.704225, frame: false, smartIsLand: false, shadow: true }
         ),
         background: makeGridBackground()
       },
@@ -2039,7 +2106,8 @@ onMounted(() => {
       <div class="proto-section" :class="{ 'proto-section-landscape': !isVerticalScreen }">
         <div :style="{ width: w + 'px', height: h + 'px' }">
           <div style="transform-origin: top left;" :style="{ transform: scale }">
-            <div ref='resultImage' class="content" id="content" style="width: 1200px; height: 1600px;">
+            <div ref='resultImage' class="content" id="content"
+              :style="{ width: (selectedProto.canvasWidth || 1200) + 'px', height: (selectedProto.canvasHeight || 1600) + 'px' }">
               <template v-if="selectedProto.background.type == 'imageText'">
                 <img id="bg-image" class="bg-image" :src="backgroundUrl"
                   :style="selectedProto.background.backgroundImageStyle()" @load="backgroundImageLoad"></img>
