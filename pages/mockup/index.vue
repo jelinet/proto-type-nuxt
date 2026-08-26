@@ -3821,7 +3821,7 @@ video {
         .carrier-text {
           position: absolute;
           top: 16px;
-          left: 16px;
+          left: 50px;
           line-height: 1;
           font-size: 16px;
           white-space: nowrap;
