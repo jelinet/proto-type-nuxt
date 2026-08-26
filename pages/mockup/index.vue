@@ -26,6 +26,12 @@ const default1Image = '/image/proto/default1.png'
 const noFrameDefault1Image = '/image/proto/no-frame-default1.png'
 const default2Image = '/image/proto/default2.png'
 const noFrameDefault2Image = '/image/proto/no-frame-default2.png'
+const boundlessThreeImage = '/image/proto/boundless-three.png'
+const boundlessFourImage = '/image/proto/boundless-four.png'
+const seamlessImage = '/image/proto/seamless.png'
+const boundlessFiveImage = '/image/proto/boundless-five.png'
+const eightDevicesImage = '/image/proto/eight-devices.png'
+const tenDevicesImage = '/image/proto/ten-devices.png'
 const magazineImage = '/image/proto/magazine.png'
 const magazineBackgroundImage = '/image/background/magazine.jpg'
 const standImage = '/image/proto/stand.png'
@@ -390,6 +396,63 @@ const screenLabelOptions = (options = []) => {
 
 // const backgroundOptions = ['图片', '渐变', '纯色']
 const backgroundOptions = ['imageText', 'gradient', 'solidColor']
+
+function gridPositions(xs, ys) {
+  let result = []
+  ys.forEach((y) => {
+    xs.forEach((x) => {
+      result.push({ x, y })
+    })
+  })
+  return result
+}
+
+function makeGridProto(positions, { defaultScale = 1, frame = true, smartIsLand = true, shadow = false } = {}) {
+  return positions.map((pos, i) => {
+    let scale = pos.scale ?? defaultScale
+    let rotate = pos.rotate ?? 0
+    return {
+      type: 'iphoneType',
+      name: `iPhone${i + 1}`,
+      frame,
+      smartIsLand,
+      style: {
+        width: '426px',
+        height: '877px',
+        transform: `rotate(${rotate}deg) translateX(${pos.x}px) translateY(${pos.y}px) scaleX(${scale}) scaleY(${scale}) perspective(none) skewX(0deg) skewY(0deg) rotateX(0deg) rotateY(0deg) rotateZ(0deg)`,
+        ...(shadow ? { filter: 'drop-shadow(rgba(0, 0, 0, 0.35) -8px 8px 16px)' } : {})
+      },
+      paperStyleMethod: (proto) => {
+        return "width: calc(100% - 36px);height: calc(100% - 32px); border-radius: 50px;position: absolute;left: 18px;top: 16px;"
+      },
+      paperChatStyle: {
+        position: 'absolute',
+        width: '390px',
+        height: '653.12px',
+        top: '115px',
+        left: '18px',
+      },
+      screenType: screenOptions['iphoneType'][0],
+      selectedTime: new Date(),
+      selectedDate: new Date(),
+      systemColor: defaultSystemColor,
+      dateTimeColor: defaultDateTimeColor
+    }
+  })
+}
+
+function makeGridBackground() {
+  return {
+    type: backgroundOptions[0],
+    needBlur: true,
+    autoUpdate: true,
+    backgroundImageStyle: () => {
+      return {
+        display: !selectedProto.value.background.needBlur ? 'block' : 'none',
+      }
+    },
+  }
+}
 
 const classicGradients = [
   'linear-gradient(135deg, rgb(238, 221, 243), rgb(238, 146, 177), rgb(99, 48, 180))',
@@ -919,6 +982,61 @@ let protoTypeList = ref([
             }
           },
         }
+      },
+      {
+        defaultProtoUrl: boundlessThreeImage,
+        exampleName: t("mockup.boundlessThree"),
+        protoList: makeGridProto([
+          { x: -330, y: 20, rotate: -8, scale: 0.9 },
+          { x: 330, y: 20, rotate: 8, scale: 0.9 },
+          { x: 0, y: -15, rotate: 0, scale: 1.0 },
+        ], { frame: false, smartIsLand: false, shadow: true }),
+        background: makeGridBackground()
+      },
+      {
+        defaultProtoUrl: boundlessFourImage,
+        exampleName: t("mockup.boundlessFour"),
+        protoList: makeGridProto(
+          gridPositions([-400, 0, 400], [-400, 400]),
+          { defaultScale: 0.85, frame: false, smartIsLand: false, shadow: true }
+        ),
+        background: makeGridBackground()
+      },
+      {
+        defaultProtoUrl: seamlessImage,
+        exampleName: t("mockup.seamless"),
+        protoList: makeGridProto(
+          gridPositions([-400, 0, 400], [-400, 400]),
+          { defaultScale: 0.94, frame: false, smartIsLand: false, shadow: false }
+        ),
+        background: makeGridBackground()
+      },
+      {
+        defaultProtoUrl: boundlessFiveImage,
+        exampleName: t("mockup.boundlessFive"),
+        protoList: makeGridProto([
+          { x: 120, y: -30, rotate: 0, scale: 1.15 },
+          { x: -220, y: 260, rotate: -6, scale: 0.72 },
+        ], { frame: false, smartIsLand: false, shadow: true }),
+        background: makeGridBackground()
+      },
+      {
+        defaultProtoUrl: eightDevicesImage,
+        exampleName: t("mockup.eightDevices"),
+        protoList: makeGridProto(
+          gridPositions([-450, -150, 150, 450], [-400, 400]),
+          { defaultScale: 0.6, frame: true, smartIsLand: true }
+        ),
+        background: makeGridBackground()
+      },
+      {
+        defaultProtoUrl: tenDevicesImage,
+        exampleName: t("mockup.tenDevices"),
+        protoList: makeGridProto(
+          gridPositions([-480, -240, 0, 240, 480], [-400, 400]),
+          { defaultScale: 0.48, frame: true, smartIsLand: true }
+        ),
+        background: makeGridBackground()
       },
     ]
   },
