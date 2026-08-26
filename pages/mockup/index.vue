@@ -260,24 +260,24 @@ import { ClientOnly } from '#components';
 
 let paperUrl = ref(defaultImage)
 const upload = ref(null)
-const handleChange = (uploadFile, uploadFiles) => {
+const handleChange = (uploadFile, uploadFiles, proto, index) => {
   let tempUrl = URL.createObjectURL(uploadFile.raw)
-  upload.value[0].clearFiles()
+  upload.value[index].clearFiles()
 
-  paperImage.value[0].onload = () => {
-    generateRecommendedGradientColors()
+  paperImage.value[index].onload = () => {
+    generateRecommendedGradientColors(index)
     selectedGradient.value = recommendedGradients.value[0]
 
-    generateRecommendedBackgroundColors()
+    generateRecommendedBackgroundColors(index)
     backgroundColor.value = recommendedBackgroundColor.value
 
     applyAutoDateTimeColors()
   }
 
-  paperUrl.value = tempUrl
+  proto.paperUrl = tempUrl
 
   if (autoUpdate.value) {
-    backgroundUrl.value = paperUrl.value
+    backgroundUrl.value = proto.paperUrl
   }
 }
 
@@ -287,14 +287,14 @@ function clearMultipleDialogImages() {
   multipleUpload.value.clearFiles()
 }
 
-let beforeMultipleExportPaperUrl = ''
+let beforeMultipleExportPaperUrls = []
 function onceExportResult() {
   const fileLength = fileList.value.length
   if (current.value < fileLength) {
     let currentFile = fileList.value[current.value]
-    paperUrl.value = currentFile.url
+    selectedProto.value.protoList.forEach((p) => { p.paperUrl = currentFile.url })
     if (autoUpdate.value) {
-      backgroundUrl.value = paperUrl.value
+      backgroundUrl.value = currentFile.url
     }
 
     paperImage.value[0].onload = () => {
@@ -352,9 +352,9 @@ function onceExportResult() {
       generateRecommendedBackgroundColors()
       backgroundColor.value = recommendedBackgroundColor.value
     }
-    paperUrl.value = beforeMultipleExportPaperUrl
+    selectedProto.value.protoList.forEach((p, i) => { p.paperUrl = beforeMultipleExportPaperUrls[i] })
     if (autoUpdate.value) {
-      backgroundUrl.value = paperUrl.value
+      backgroundUrl.value = beforeMultipleExportPaperUrls[0]
     }
   }
 }
@@ -363,7 +363,7 @@ let multipleExportStart = ref(false)
 let multipleExportEnd = ref(false)
 function multipleExportResult() {
   multipleExportStart.value = true
-  beforeMultipleExportPaperUrl = paperUrl.value
+  beforeMultipleExportPaperUrls = selectedProto.value.protoList.map((p) => p.paperUrl || paperUrl.value)
   current.value = 0
   onceExportResult()
 }
@@ -1936,8 +1936,8 @@ function backgroundTypeChange(type) {
   }
 }
 
-function generateRecommendedGradientColors() {
-  let paperElement = paperImage.value[0]
+function generateRecommendedGradientColors(index = 0) {
+  let paperElement = paperImage.value[index]
   let mainColors = getMainColorsByImg(paperElement, 3)
   recommendedGradients.value = []
   for (let i = 0; i < mainColors.length - 1; i++) {
@@ -1948,28 +1948,26 @@ function generateRecommendedGradientColors() {
   }
 }
 
-function generateRecommendedBackgroundColors() {
-  let paperElement = paperImage.value[0]
+function generateRecommendedBackgroundColors(index = 0) {
+  let paperElement = paperImage.value[index]
   let mainColors = getMainColorsByImg(paperElement, 1)
   recommendedBackgroundColor.value = mainColors[0]
 }
 
 function applyAutoDateTimeColors() {
   if (!selectedProto.value) return
-  let paperElement = paperImage.value && paperImage.value[0]
-  if (!paperElement || !paperElement.naturalWidth) return
-  let mainColor = getMainColorsByImg(paperElement, 1)[0]
-  selectedProto.value.protoList.forEach((proto) => {
-    if (proto.autoColor) {
-      proto.dateTimeColor = mainColor
-    }
+  selectedProto.value.protoList.forEach((proto, index) => {
+    if (!proto.autoColor) return
+    let paperElement = paperImage.value && paperImage.value[index]
+    if (!paperElement || !paperElement.naturalWidth) return
+    proto.dateTimeColor = getMainColorsByImg(paperElement, 1)[0]
   })
 }
 
-function toggleAutoColor(proto, enabled) {
+function toggleAutoColor(proto, enabled, index) {
   proto.autoColor = enabled
   if (enabled) {
-    let paperElement = paperImage.value && paperImage.value[0]
+    let paperElement = paperImage.value && paperImage.value[index]
     if (paperElement && paperElement.naturalWidth) {
       proto.dateTimeColor = getMainColorsByImg(paperElement, 1)[0]
     }
@@ -2143,7 +2141,7 @@ onMounted(() => {
                   <!-- 壁纸内容 -->
                   <div v-if="['lockScreen', 'desktopScreen', 'onlyMockUp'].includes(proto.screenType)" class="paper"
                     :style="proto.paperStyleMethod(proto)">
-                    <img ref="paperImage" class="image" :src="paperUrl"></img>
+                    <img ref="paperImage" class="image" :src="proto.paperUrl || paperUrl"></img>
 
                     <!-- 平板/电脑界面的组件 -->
                     <div
@@ -2335,7 +2333,7 @@ onMounted(() => {
                   <!-- iphoneType界面的组件 -->
                   <template v-if="proto.type == 'iphoneType'">
                     <div v-if="['聊天'].includes(proto.screenType)" class="paper" :style="proto.paperChatStyle">
-                      <img ref="paperImage" class="image" :src="paperUrl"></img>
+                      <img ref="paperImage" class="image" :src="proto.paperUrl || paperUrl"></img>
                     </div>
 
                     <div v-if="['lockScreen', 'desktopScreen', '聊天'].includes(proto.screenType)" class="system">
@@ -2836,8 +2834,9 @@ onMounted(() => {
             <el-segmented v-model="proto.screenType" :options="screenLabelOptions(screenOptions[proto.type])" block />
             <div class="paper-setting">
               <div>{{ t("mockup.wallPaperText") }}</div>
-              <el-upload ref="upload" class="upload-demo" :drag="true" :on-change="handleChange" :show-file-list="false"
-                :auto-upload="false" action="#" :limit="1">
+              <el-upload ref="upload" class="upload-demo" :drag="true"
+                :on-change="(uploadFile, uploadFiles) => handleChange(uploadFile, uploadFiles, proto, index)"
+                :show-file-list="false" :auto-upload="false" action="#" :limit="1">
                 <div class="el-upload__text">
                   {{ t("mockup.dragToHere") }}
                 </div>
@@ -2899,7 +2898,7 @@ onMounted(() => {
                 :predefine="['rgb(255, 255, 255)', 'rgb(76, 76, 76)', 'rgb(26, 114, 167)', 'rgb(99, 136, 165)', 'rgb(12, 60, 148)', 'rgb(89, 52, 40)', 'rgb(162, 216, 228)']" />
             </div>
             <div v-if="proto.screenType == 'lockScreen'" class="auto-color-setting">
-              <el-checkbox :model-value="!!proto.autoColor" @change="toggleAutoColor(proto, $event)">{{
+              <el-checkbox :model-value="!!proto.autoColor" @change="toggleAutoColor(proto, $event, index)">{{
                 t("mockup.autoColor") }}</el-checkbox>
             </div>
 
