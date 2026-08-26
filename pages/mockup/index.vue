@@ -255,6 +255,8 @@ const handleChange = (uploadFile, uploadFiles) => {
 
     generateRecommendedBackgroundColors()
     backgroundColor.value = recommendedBackgroundColor.value
+
+    applyAutoDateTimeColors()
   }
 
   paperUrl.value = tempUrl
@@ -1699,12 +1701,26 @@ const fontList = [
 ]
 let fontRadio = ref(fontList[0].value)
 
+function protoShadowEnabled(proto) {
+  if (proto.shadow !== undefined) return proto.shadow
+  let style = proto.style
+  if (style && typeof style === 'object' && typeof style.filter === 'string') {
+    return style.filter.includes('drop-shadow')
+  }
+  return false
+}
+
+function protoShadowFilter(proto) {
+  return protoShadowEnabled(proto) ? 'drop-shadow(rgba(0, 0, 0, 0.5) -10px 5px 20px)' : 'none'
+}
+
 function timeStyle(proto) {
   let result = {
     'font-size': '110px',
     'line-height': 1,
     color: proto.dateTimeColor,
-    'font-family': fontRadio.value
+    'font-family': fontRadio.value,
+    'font-weight': proto.timeBold ? 'bold' : 'normal'
   }
 
   if (fontRadio.value == 'Oswald-Stencil') {
@@ -1751,6 +1767,28 @@ function generateRecommendedBackgroundColors() {
   let paperElement = paperImage.value[0]
   let mainColors = getMainColorsByImg(paperElement, 1)
   recommendedBackgroundColor.value = mainColors[0]
+}
+
+function applyAutoDateTimeColors() {
+  if (!selectedProto.value) return
+  let paperElement = paperImage.value && paperImage.value[0]
+  if (!paperElement || !paperElement.naturalWidth) return
+  let mainColor = getMainColorsByImg(paperElement, 1)[0]
+  selectedProto.value.protoList.forEach((proto) => {
+    if (proto.autoColor) {
+      proto.dateTimeColor = mainColor
+    }
+  })
+}
+
+function toggleAutoColor(proto, enabled) {
+  proto.autoColor = enabled
+  if (enabled) {
+    let paperElement = paperImage.value && paperImage.value[0]
+    if (paperElement && paperElement.naturalWidth) {
+      proto.dateTimeColor = getMainColorsByImg(paperElement, 1)[0]
+    }
+  }
 }
 
 function getMainColorsByImg(imageElement, numColors) {
@@ -1901,12 +1939,16 @@ onMounted(() => {
 
               <div class="main-page" @click="clickBackground">
                 <div @click.stop="clickProto(proto.name)" class="proto"
-                  v-for="(proto, index) in selectedProto.protoList" :style="proto.style">
+                  v-for="(proto, index) in selectedProto.protoList" :style="[proto.style, { filter: protoShadowFilter(proto) }]">
                   <!-- 边框部分 -->
                   <img crossorigin="" v-if="proto.type == 'iphoneType' && proto.frame" class="frame"
                     src="/image/frame-1.png"></img>
-                  <img crossorigin="" v-if="proto.type == 'iphoneType' && proto.smartIsLand" class="smart-isLand"
-                    src="/image/hair.png"></img>
+                  <img crossorigin=""
+                    v-if="proto.type == 'iphoneType' && proto.smartIsLand && (proto.smartIslandShape || 'ellipse') == 'ellipse'"
+                    class="smart-isLand" src="/image/hair.png"></img>
+                  <div
+                    v-if="proto.type == 'iphoneType' && proto.smartIsLand && proto.smartIslandShape == 'circle'"
+                    class="smart-isLand-circle"></div>
                   <div v-if="proto.type == 'macType' && proto.frame"
                     style="width: 4096px;height: 2459px;position: absolute;z-index: 20;">
                     <img class="frame" src="/image/mac-modal.png"></img>
@@ -2117,6 +2159,10 @@ onMounted(() => {
                           proto.selectedTime.getHours() }}<span style="position: relative;top: -1.32143px;">:</span>{{
                           formatTimeMinutes(proto.selectedTime.getMinutes()) }}
                       </div>
+
+                      <div v-if="proto.carrierText" class="carrier-text"
+                        :style="{ color: proto.screenType == '聊天' ? '#000000' : proto.systemColor }">{{
+                          proto.carrierText }}</div>
 
                       <svg width="390" height="53" viewBox="0 0 390 53" transform="translate(-6 -5)"
                         :fill="proto.screenType == '聊天' ? '#000000' : proto.systemColor"
@@ -2631,6 +2677,11 @@ onMounted(() => {
                   format="HH:mm" :clearable="false" />
               </div>
 
+              <div class="date-time-color-setting">
+                <div>{{ t("mockup.timeBold") }}</div>
+                <el-switch v-model="proto.timeBold" style="--el-switch-on-color: #13ce66;" />
+              </div>
+
               <div class="component-setting">
                 <div>{{ t("mockup.timeFont") }}</div>
                 <el-radio-group v-model="fontRadio">
@@ -2657,8 +2708,13 @@ onMounted(() => {
 
             <div v-if="proto.screenType == 'lockScreen'" class="date-time-color-setting">
               <div>{{ t("mockup.customColor") }}</div>
-              <el-color-picker @active-change="dateTimeColorChange($event, proto)" v-model="proto.dateTimeColor"
+              <el-color-picker :disabled="proto.autoColor" @active-change="dateTimeColorChange($event, proto)"
+                v-model="proto.dateTimeColor"
                 :predefine="['rgb(255, 255, 255)', 'rgb(76, 76, 76)', 'rgb(26, 114, 167)', 'rgb(99, 136, 165)', 'rgb(12, 60, 148)', 'rgb(89, 52, 40)', 'rgb(162, 216, 228)']" />
+            </div>
+            <div v-if="proto.screenType == 'lockScreen'" class="auto-color-setting">
+              <el-checkbox :model-value="!!proto.autoColor" @change="toggleAutoColor(proto, $event)">{{
+                t("mockup.autoColor") }}</el-checkbox>
             </div>
 
             <template v-if="proto.type == 'iphoneType'">
@@ -2682,9 +2738,30 @@ onMounted(() => {
               <el-switch v-model="proto.frame" style="--el-switch-on-color: #13ce66;" />
             </div>
 
+            <div class="date-time-color-setting">
+              <div>{{ t("mockup.shadow") }}</div>
+              <el-switch :model-value="protoShadowEnabled(proto)" @change="proto.shadow = $event"
+                style="--el-switch-on-color: #13ce66;" />
+            </div>
+
             <div v-if="proto.type == 'iphoneType'" class="date-time-color-setting">
               <div>{{ t("mockup.dynamicIsland") }}</div>
               <el-switch v-model="proto.smartIsLand" style="--el-switch-on-color: #13ce66;" />
+            </div>
+
+            <div v-if="proto.type == 'iphoneType' && proto.smartIsLand" class="component-setting">
+              <div>{{ t("mockup.dynamicIslandShape") }}</div>
+              <el-radio-group :model-value="proto.smartIslandShape || 'ellipse'"
+                @update:model-value="proto.smartIslandShape = $event">
+                <el-radio value="ellipse">{{ t("mockup.ellipse") }}</el-radio>
+                <el-radio value="circle">{{ t("mockup.circle") }}</el-radio>
+              </el-radio-group>
+            </div>
+
+            <div v-if="proto.type == 'iphoneType' && ['lockScreen', 'desktopScreen'].includes(proto.screenType)"
+              class="date-time-color-setting">
+              <div>{{ t("mockup.carrierText") }}</div>
+              <el-input v-model="proto.carrierText" style="width: 148px" />
             </div>
 
           </el-tab-pane>
@@ -3275,6 +3352,12 @@ video {
 
     }
 
+    .auto-color-setting {
+      display: flex;
+      justify-content: flex-end;
+      padding-top: 6px;
+    }
+
     .component-setting {
       display: flex;
       justify-content: space-between;
@@ -3503,6 +3586,17 @@ video {
         z-index: 10;
       }
 
+      .smart-isLand-circle {
+        position: absolute;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #000000;
+        top: 26px;
+        left: 195px;
+        z-index: 10;
+      }
+
       .paper {
         position: relative;
         overflow: hidden;
@@ -3537,6 +3631,15 @@ video {
           color: rgb(0, 0, 0);
           font-size: 18.5px;
           font-weight: unset;
+        }
+
+        .carrier-text {
+          position: absolute;
+          top: 44px;
+          left: 0px;
+          line-height: 1;
+          font-size: 13px;
+          white-space: nowrap;
         }
       }
 
