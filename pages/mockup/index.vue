@@ -1864,11 +1864,8 @@ function backgroundColorChange(color) {
 }
 
 let defaultComponentText = `${t("mockup.fairy")} iPhone`
-let componentText = ref(defaultComponentText)
 
 let defaultCarrierText = t("mockup.defaultCarrier")
-
-let componentRadio = ref(1)
 
 let desktopRadio = ref(1)
 
@@ -2641,7 +2638,7 @@ onMounted(() => {
                         </div>
                       </div>
 
-                      <div v-if="componentRadio == 1" class="component-one">
+                      <div v-if="(proto.componentRadio ?? 1) == 1" class="component-one">
                         <svg width="328" height="70" viewBox="0 0 328 70" fill="none"
                           xmlns="http://www.w3.org/2000/svg">
                           <defs>
@@ -2713,11 +2710,11 @@ onMounted(() => {
                             </clipPath>
                           </defs>
                         </svg>
-                        <div class="text" :style="{ color: proto.dateTimeColor }">{{ componentText ? componentText :
+                        <div class="text" :style="{ color: proto.dateTimeColor }">{{ proto.componentText ? proto.componentText :
                           defaultComponentText }}</div>
                       </div>
 
-                      <svg class="component-two" v-if="componentRadio == 2" width="336" height="72" viewBox="0 0 336 72"
+                      <svg class="component-two" v-if="(proto.componentRadio ?? 1) == 2" width="336" height="72" viewBox="0 0 336 72"
                         fill="none" xmlns="http://www.w3.org/2000/svg" style="top: 230px; left: 49px;">
                         <g clip-path="url(#clip0_420_1695)">
                           <rect opacity="0.32" x="8" y="56" width="144" height="8" rx="4" :fill="proto.dateTimeColor">
@@ -2907,16 +2904,17 @@ onMounted(() => {
             <template v-if="proto.type == 'iphoneType'">
               <div v-if="proto.screenType == 'lockScreen'" class="component-setting">
                 <div>{{ t("mockup.widget") }}</div>
-                <el-radio-group v-model="componentRadio">
+                <el-radio-group :model-value="proto.componentRadio ?? 1" @update:model-value="proto.componentRadio = $event">
                   <el-radio :value="0">{{ t("mockup.hide") }}</el-radio>
                   <el-radio :value="1">{{ t("mockup.widgetStyleOne") }}</el-radio>
                   <el-radio :value="2">{{ t("mockup.widgetStyleTwo") }}</el-radio>
                 </el-radio-group>
               </div>
 
-              <div v-if="proto.screenType == 'lockScreen' && componentRadio == 1" class="component-setting">
+              <div v-if="proto.screenType == 'lockScreen' && (proto.componentRadio ?? 1) == 1" class="component-setting">
                 <div>{{ t("mockup.widgetText") }}</div>
-                <el-input v-model="componentText" style="width: 148px" :placeholder="defaultComponentText" />
+                <el-input :model-value="proto.componentText" @input="proto.componentText = $event" style="width: 148px"
+                  :placeholder="defaultComponentText" />
               </div>
             </template>
 
