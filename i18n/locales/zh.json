@@ -27,6 +27,8 @@
     "onlyMockUp": "仅样机",
     "wallPaperText": "壁纸",
     "dragToHere": "点击上传或拖拽到此",
+    "batchUpload": "批量上传",
+    "batchUploadTip": "选择多张图片，依次填充到各机型",
     "dateText": "日期",
     "selectDateText": "选择日期",
     "timeText": "时间",

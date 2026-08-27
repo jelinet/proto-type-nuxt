@@ -281,6 +281,39 @@ const handleChange = (uploadFile, uploadFiles, proto, index) => {
   }
 }
 
+const batchUpload = ref(null)
+const handleBatchUploadChange = (uploadFile, uploadFiles) => {
+  const protoList = selectedProto.value.protoList
+  const count = Math.min(uploadFiles.length, protoList.length)
+
+  for (let i = 0; i < count; i++) {
+    const file = uploadFiles[i]
+    if (!file.url) {
+      file.url = URL.createObjectURL(file.raw)
+    }
+    protoList[i].paperUrl = file.url
+
+    paperImage.value[i].onload = () => {
+      if (i == 0) {
+        generateRecommendedGradientColors()
+        selectedGradient.value = recommendedGradients.value[0]
+
+        generateRecommendedBackgroundColors()
+        backgroundColor.value = recommendedBackgroundColor.value
+      }
+      applyAutoDateTimeColors()
+    }
+  }
+
+  if (autoUpdate.value) {
+    backgroundUrl.value = protoList[0].paperUrl
+  }
+
+  if (uploadFiles.length >= protoList.length) {
+    batchUpload.value.clearFiles()
+  }
+}
+
 const multipleUpload = ref(null)
 
 function clearMultipleDialogImages() {
@@ -2828,6 +2861,15 @@ onMounted(() => {
 
       <div class="setting-section"
         :class="{ 'setting-section-landscape': !isVerticalScreen, 'setting-section-vertical': isVerticalScreen }">
+        <div v-if="selectedProto.protoList.length > 1" class="paper-setting batch-upload-setting">
+          <div>{{ t("mockup.batchUpload") }}</div>
+          <el-upload ref="batchUpload" class="upload-demo" :drag="true" :multiple="true"
+            :on-change="handleBatchUploadChange" :show-file-list="false" :auto-upload="false" action="#">
+            <div class="el-upload__text">
+              {{ t("mockup.batchUploadTip") }}
+            </div>
+          </el-upload>
+        </div>
         <el-tabs v-model="activeProtoName" class="demo-tabs" @tab-click="handleClick" :stretch="false">
           <el-tab-pane :label="proto.name" :name="proto.name" v-for="(proto, index) in selectedProto.protoList">
             <el-segmented v-model="proto.screenType" :options="screenLabelOptions(screenOptions[proto.type])" block />

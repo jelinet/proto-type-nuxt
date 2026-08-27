@@ -27,6 +27,8 @@
     "onlyMockUp": "Only mockup",
     "wallPaperText": "Wall paper",
     "dragToHere": "Click to upload or drag and drop here",
+    "batchUpload": "Batch upload",
+    "batchUploadTip": "Select multiple images to fill each device in order",
     "dateText": "Date",
     "selectDateText": "Select Date",
     "timeText": "Time",
