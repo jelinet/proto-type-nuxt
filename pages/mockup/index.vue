@@ -442,8 +442,8 @@ function makeGridProto(positions, { defaultScale = 1, frame = true, smartIsLand 
         left: '18px',
       },
       screenType: screenOptions['iphoneType'][0],
-      selectedTime: new Date(),
-      selectedDate: new Date(),
+      selectedTime: new Date(2026, 4, 20, 13, 14),
+      selectedDate: new Date(2026, 4, 20),
       systemColor: defaultSystemColor,
       dateTimeColor: defaultDateTimeColor
     }
@@ -533,8 +533,8 @@ let protoTypeList = ref([
               left: '18px',
             },
             screenType: screenOptions['iphoneType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           }
@@ -575,8 +575,8 @@ let protoTypeList = ref([
               left: '18px',
             },
             screenType: screenOptions['iphoneType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           }
@@ -613,8 +613,8 @@ let protoTypeList = ref([
               left: '18px',
             },
             screenType: screenOptions['iphoneType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           },
@@ -635,8 +635,8 @@ let protoTypeList = ref([
               left: '18px',
             },
             screenType: screenOptions['iphoneType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           }
@@ -678,8 +678,8 @@ let protoTypeList = ref([
               left: '18px',
             },
             screenType: screenOptions['iphoneType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           },
@@ -705,8 +705,8 @@ let protoTypeList = ref([
               left: '18px',
             },
             screenType: screenOptions['iphoneType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           }
@@ -748,8 +748,8 @@ let protoTypeList = ref([
               left: '18px',
             },
             screenType: screenOptions['iphoneType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           }
@@ -798,8 +798,8 @@ let protoTypeList = ref([
               left: '18px',
             },
             screenType: screenOptions['iphoneType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           }
@@ -842,8 +842,8 @@ let protoTypeList = ref([
               left: '18px',
             },
             screenType: screenOptions['iphoneType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           }
@@ -886,8 +886,8 @@ let protoTypeList = ref([
               left: '18px',
             },
             screenType: screenOptions['iphoneType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           }
@@ -930,8 +930,8 @@ let protoTypeList = ref([
               left: '18px',
             },
             screenType: screenOptions['iphoneType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           }
@@ -975,8 +975,8 @@ let protoTypeList = ref([
               left: '18px',
             },
             screenType: screenOptions['iphoneType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           }
@@ -1136,8 +1136,8 @@ let protoTypeList = ref([
 
             },
             screenType: screenOptions['ipadType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           }
@@ -1180,8 +1180,8 @@ let protoTypeList = ref([
 
             },
             screenType: screenOptions['ipadType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           }
@@ -1223,8 +1223,8 @@ let protoTypeList = ref([
 
             },
             screenType: screenOptions['ipadType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           },
@@ -1250,8 +1250,8 @@ let protoTypeList = ref([
 
             },
             screenType: screenOptions['ipadType'][1],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           }
@@ -1294,8 +1294,8 @@ let protoTypeList = ref([
 
             },
             screenType: screenOptions['ipadType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           }
@@ -1339,8 +1339,8 @@ let protoTypeList = ref([
 
             },
             screenType: screenOptions['ipadType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           }
@@ -1384,8 +1384,8 @@ let protoTypeList = ref([
 
             },
             screenType: screenOptions['ipadType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           }
@@ -1435,8 +1435,8 @@ let protoTypeList = ref([
               }
             },
             screenType: screenOptions['macType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           }
@@ -1483,8 +1483,8 @@ let protoTypeList = ref([
               left: '18px',
             },
             screenType: screenOptions['iphoneType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           },
@@ -1510,8 +1510,8 @@ let protoTypeList = ref([
 
             },
             screenType: screenOptions['ipadType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           },
@@ -1553,8 +1553,8 @@ let protoTypeList = ref([
               left: '18px',
             },
             screenType: screenOptions['iphoneType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           },
@@ -1580,8 +1580,8 @@ let protoTypeList = ref([
 
             },
             screenType: screenOptions['ipadType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           },
@@ -1608,8 +1608,8 @@ let protoTypeList = ref([
               }
             },
             screenType: screenOptions['macType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           }
@@ -1651,8 +1651,8 @@ let protoTypeList = ref([
 
             },
             screenType: screenOptions['ipadType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           },
@@ -1679,8 +1679,8 @@ let protoTypeList = ref([
               }
             },
             screenType: screenOptions['macType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           },
@@ -1706,8 +1706,8 @@ let protoTypeList = ref([
               left: '18px',
             },
             screenType: screenOptions['iphoneType'][0],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           },
@@ -1733,8 +1733,8 @@ let protoTypeList = ref([
               left: '18px',
             },
             screenType: screenOptions['iphoneType'][1],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           },
@@ -1760,8 +1760,8 @@ let protoTypeList = ref([
               left: '18px',
             },
             screenType: screenOptions['iphoneType'][2],
-            selectedTime: new Date(),
-            selectedDate: new Date(),
+            selectedTime: new Date(2026, 4, 20, 13, 14),
+            selectedDate: new Date(2026, 4, 20),
             systemColor: defaultSystemColor,
             dateTimeColor: defaultDateTimeColor
           },
@@ -1865,6 +1865,8 @@ function backgroundColorChange(color) {
 
 let defaultComponentText = `${t("mockup.fairy")} iPhone`
 let componentText = ref(defaultComponentText)
+
+let defaultCarrierText = t("mockup.defaultCarrier")
 
 let componentRadio = ref(1)
 
@@ -2344,9 +2346,9 @@ onMounted(() => {
                           formatTimeMinutes(proto.selectedTime.getMinutes()) }}
                       </div>
 
-                      <div v-if="proto.carrierText" class="carrier-text"
+                      <div v-if="proto.carrierText ?? defaultCarrierText" class="carrier-text"
                         :style="{ color: proto.screenType == '聊天' ? '#000000' : proto.systemColor }">{{
-                          proto.carrierText }}</div>
+                          proto.carrierText ?? defaultCarrierText }}</div>
 
                       <svg width="390" height="53" viewBox="0 0 390 53" transform="translate(-6 -5)"
                         :fill="proto.screenType == '聊天' ? '#000000' : proto.systemColor"
@@ -2946,7 +2948,8 @@ onMounted(() => {
             <div v-if="proto.type == 'iphoneType' && ['lockScreen', 'desktopScreen'].includes(proto.screenType)"
               class="date-time-color-setting">
               <div>{{ t("mockup.carrierText") }}</div>
-              <el-input v-model="proto.carrierText" style="width: 148px" />
+              <el-input :model-value="proto.carrierText ?? defaultCarrierText" @input="proto.carrierText = $event"
+                style="width: 148px" />
             </div>
 
           </el-tab-pane>
