@@ -131,6 +131,7 @@ function backgroundImageLoad() {
 }
 
 let scale = ref(0)
+let canvasScale = ref(1)
 
 let w = ref(0);
 let h = ref(0);
@@ -166,6 +167,7 @@ function changeProtoWidth() {
     let s = w.value / canvasWidth
 
     scale.value = `scale(${s})`
+    canvasScale.value = s
   } else {
     let maxWidth = windowWidth - 328 - 320 - 32;
     let maxHeight = windowHeight - 50 - 60 - 68;
@@ -178,6 +180,7 @@ function changeProtoWidth() {
     let s = w.value / canvasWidth
 
     scale.value = `scale(${s})`
+    canvasScale.value = s
   }
 
   // 计算导出图片的宽高
@@ -1834,6 +1837,124 @@ function clickBackground() {
   }
 }
 
+function getProtoStyleObject(proto) {
+  let style = proto.style
+  if (typeof style === 'string') {
+    let result = {}
+    style.split(';').forEach((pair) => {
+      let idx = pair.indexOf(':')
+      if (idx === -1) return
+      let key = pair.slice(0, idx).trim()
+      let value = pair.slice(idx + 1).trim()
+      if (key) result[key] = value
+    })
+    return result
+  }
+  if (style && typeof style === 'object') {
+    return { ...style }
+  }
+  return {}
+}
+
+function getTransformComponent(transform, name) {
+  let match = transform && transform.match(new RegExp(name + '\\(([-\\d.]+)'))
+  return match ? parseFloat(match[1]) : 0
+}
+
+function protoRenderStyle(proto) {
+  let styleObj = getProtoStyleObject(proto)
+  let dragX = proto.dragX || 0
+  let dragY = proto.dragY || 0
+
+  if (dragX || dragY) {
+    let transform = styleObj.transform || ''
+    let baseX = getTransformComponent(transform, 'translateX')
+    let baseY = getTransformComponent(transform, 'translateY')
+    let newX = baseX + dragX
+    let newY = baseY + dragY
+
+    if (transform.includes('translateX(')) {
+      transform = transform.replace(/translateX\([-\d.]+px\)/, `translateX(${newX}px)`)
+    } else {
+      transform = `translateX(${newX}px) ${transform}`
+    }
+    if (transform.includes('translateY(')) {
+      transform = transform.replace(/translateY\([-\d.]+px\)/, `translateY(${newY}px)`)
+    } else {
+      transform = `translateY(${newY}px) ${transform}`
+    }
+    styleObj.transform = transform
+  }
+
+  return styleObj
+}
+
+let protoDragState = null
+
+function startProtoDrag(event, proto) {
+  event.preventDefault()
+  let point = event.touches ? event.touches[0] : event
+  let styleObj = getProtoStyleObject(proto)
+  let rotate = getTransformComponent(styleObj.transform || '', 'rotate')
+
+  protoDragState = {
+    proto,
+    startClientX: point.clientX,
+    startClientY: point.clientY,
+    startDragX: proto.dragX || 0,
+    startDragY: proto.dragY || 0,
+    rotateRad: rotate * Math.PI / 180,
+    moved: false,
+  }
+
+  window.addEventListener('mousemove', onProtoDragMove)
+  window.addEventListener('mouseup', onProtoDragEnd)
+  window.addEventListener('touchmove', onProtoDragMove, { passive: false })
+  window.addEventListener('touchend', onProtoDragEnd)
+}
+
+function onProtoDragMove(event) {
+  if (!protoDragState) return
+  let point = event.touches ? event.touches[0] : event
+  if (event.touches) event.preventDefault()
+
+  let screenDx = point.clientX - protoDragState.startClientX
+  let screenDy = point.clientY - protoDragState.startClientY
+
+  if (!protoDragState.moved && Math.hypot(screenDx, screenDy) > 3) {
+    protoDragState.moved = true
+  }
+
+  let s = canvasScale.value || 1
+  let canvasDx = screenDx / s
+  let canvasDy = screenDy / s
+
+  let cos = Math.cos(protoDragState.rotateRad)
+  let sin = Math.sin(protoDragState.rotateRad)
+  let localDx = cos * canvasDx + sin * canvasDy
+  let localDy = -sin * canvasDx + cos * canvasDy
+
+  protoDragState.proto.dragX = protoDragState.startDragX + localDx
+  protoDragState.proto.dragY = protoDragState.startDragY + localDy
+}
+
+function onProtoDragEnd() {
+  if (!protoDragState) return
+  let moved = protoDragState.moved
+  let proto = protoDragState.proto
+
+  window.removeEventListener('mousemove', onProtoDragMove)
+  window.removeEventListener('mouseup', onProtoDragEnd)
+  window.removeEventListener('touchmove', onProtoDragMove)
+  window.removeEventListener('touchend', onProtoDragEnd)
+
+  protoDragState = null
+
+  if (!moved) {
+    clickProto(proto.name)
+  }
+}
+
 let dateShortcuts = [{
   text: t('mockup.todayText'),
   value: new Date(),
@@ -2154,8 +2275,9 @@ onMounted(() => {
               </template>
 
               <div class="main-page" @click="clickBackground">
-                <div @click.stop="clickProto(proto.name)" class="proto"
-                  v-for="(proto, index) in selectedProto.protoList" :style="[proto.style, { filter: protoShadowFilter(proto) }]">
+                <div @click.stop class="proto" @mousedown="startProtoDrag($event, proto)"
+                  @touchstart="startProtoDrag($event, proto)" v-for="(proto, index) in selectedProto.protoList"
+                  :style="[protoRenderStyle(proto), { filter: protoShadowFilter(proto) }]">
                   <!-- 边框部分 -->
                   <img crossorigin="" v-if="proto.type == 'iphoneType' && proto.frame" class="frame"
                     src="/image/frame-1.png"></img>
@@ -3800,6 +3922,8 @@ video {
 
     .proto {
       position: absolute;
+      cursor: move;
+      touch-action: none;
 
       .frame {
         width: 100%;
