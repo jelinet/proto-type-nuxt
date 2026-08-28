@@ -14,55 +14,8 @@
 }
 
 @font-face {
-    font-family: BarlowCondensed-iOS26;
-    src: url(../font/BarlowCondensed-Thin.ttf);
-    font-weight: 100;
-}
-
-@font-face {
-    font-family: BarlowCondensed-iOS26;
-    src: url(../font/BarlowCondensed-ExtraLight.ttf);
-    font-weight: 200;
-}
-
-@font-face {
-    font-family: BarlowCondensed-iOS26;
-    src: url(../font/BarlowCondensed-Light.ttf);
-    font-weight: 300;
-}
-
-@font-face {
-    font-family: BarlowCondensed-iOS26;
-    src: url(../font/BarlowCondensed-Regular.ttf);
-    font-weight: 400;
-}
-
-@font-face {
-    font-family: BarlowCondensed-iOS26;
-    src: url(../font/BarlowCondensed-Medium.ttf);
-    font-weight: 500;
-}
-
-@font-face {
-    font-family: BarlowCondensed-iOS26;
-    src: url(../font/BarlowCondensed-SemiBold.ttf);
-    font-weight: 600;
-}
-
-@font-face {
-    font-family: BarlowCondensed-iOS26;
-    src: url(../font/BarlowCondensed-Bold.ttf);
-    font-weight: 700;
-}
-
-@font-face {
-    font-family: BarlowCondensed-iOS26;
-    src: url(../font/BarlowCondensed-ExtraBold.ttf);
-    font-weight: 800;
-}
-
-@font-face {
-    font-family: BarlowCondensed-iOS26;
-    src: url(../font/BarlowCondensed-Black.ttf);
-    font-weight: 900;
+    font-family: RobotoFlex-iOS26;
+    src: url(../font/RobotoFlex-iOS26.ttf);
+    font-weight: 100 1000;
+    font-stretch: 25% 151%;
 }

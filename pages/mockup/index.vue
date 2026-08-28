@@ -2154,13 +2154,13 @@ const fontList = [
   },
   {
     label: t('mockup.ios26'),
-    value: 'BarlowCondensed-iOS26',
+    value: 'RobotoFlex-iOS26',
   },
 ]
 
 const defaultIosFontHeight = 1.1
 const defaultIosFontWeight = 200
-const iosFontSize = 150
+const iosFontSize = 135
 function protoShadowEnabled(proto) {
   if (proto.shadow !== undefined) return proto.shadow
   let style = proto.style
@@ -2188,10 +2188,17 @@ function timeStyle(proto) {
     result = { ...result, ...{ transform: 'scaleY(0.7)' } }
   } else if (fontRadio == 'Monoton-Regular') {
     result = { ...result, ...{ transform: 'scaleY(0.7) scaleX(0.85)' } }
-  } else if (fontRadio == 'BarlowCondensed-iOS26') {
+  } else if (fontRadio == 'RobotoFlex-iOS26') {
     let height = proto.iosFontHeight ?? defaultIosFontHeight
     let weight = proto.iosFontWeight ?? defaultIosFontWeight
-    result = { ...result, ...{ 'font-size': `${iosFontSize}px`, transform: `scaleY(${height})`, 'font-weight': weight } }
+    result = {
+      ...result, ...{
+        'font-size': `${iosFontSize}px`,
+        'font-stretch': '70%',
+        transform: `scaleY(${height})`,
+        'font-weight': weight
+      }
+    }
   }
   return result;
 }
@@ -2583,7 +2590,7 @@ onMounted(() => {
                             {{
                               formatedDate(proto.selectedDate, proto) }}</div>
                           <div class="time" :style="timeStyle(proto)">{{
-                            proto.selectedTime.getHours() }}<span v-if="(proto.fontRadio ?? fontList[0].value) == 'BarlowCondensed-iOS26'" class="ios26-colon"></span><span v-else style="position: relative;top: -7.85714px;">:</span>{{
+                            proto.selectedTime.getHours() }}<span v-if="(proto.fontRadio ?? fontList[0].value) == 'RobotoFlex-iOS26'" class="ios26-colon"></span><span v-else style="position: relative;top: -7.85714px;">:</span>{{
                               formatTimeMinutes(proto.selectedTime.getMinutes()) }}
                           </div>
                         </div>
@@ -2595,7 +2602,7 @@ onMounted(() => {
                             {{
                               formatedDate(proto.selectedDate, proto) }}</div>
                           <div class="time" :style="timeStyle(proto)">{{
-                            proto.selectedTime.getHours() }}<span v-if="(proto.fontRadio ?? fontList[0].value) == 'BarlowCondensed-iOS26'" class="ios26-colon"></span><span v-else style="position: relative;top: -7.85714px;">:</span>{{
+                            proto.selectedTime.getHours() }}<span v-if="(proto.fontRadio ?? fontList[0].value) == 'RobotoFlex-iOS26'" class="ios26-colon"></span><span v-else style="position: relative;top: -7.85714px;">:</span>{{
                               formatTimeMinutes(proto.selectedTime.getMinutes()) }}
                           </div>
                         </div>
@@ -2914,7 +2921,9 @@ onMounted(() => {
                       <div class="date-time">
                         <div class="date" :style="{ color: proto.dateTimeColor }">{{ formatedDate(proto.selectedDate, proto) }}
                         </div>
-                        <div class="time" :style="timeStyle(proto)">{{ proto.selectedTime.getHours() }}<span
+                        <div class="time" :style="timeStyle(proto)">{{ proto.selectedTime.getHours()
+                        }}<span v-if="(proto.fontRadio ?? fontList[0].value) == 'RobotoFlex-iOS26'"
+                            class="ios26-colon"></span><span v-else
                             style="position: relative;top: -7.85714px;">:</span>{{
                               formatTimeMinutes(proto.selectedTime.getMinutes()) }}
                         </div>
@@ -3233,7 +3242,7 @@ onMounted(() => {
                 </el-radio-group>
               </div>
 
-              <template v-if="(proto.fontRadio ?? fontList[0].value) == 'BarlowCondensed-iOS26'">
+              <template v-if="(proto.fontRadio ?? fontList[0].value) == 'RobotoFlex-iOS26'">
                 <div class="date-time-color-setting">
                   <div>{{ t("mockup.fontHeight") }}</div>
                   <el-slider :model-value="proto.iosFontHeight ?? defaultIosFontHeight"
@@ -3243,7 +3252,7 @@ onMounted(() => {
                 <div class="date-time-color-setting">
                   <div>{{ t("mockup.fontWeight") }}</div>
                   <el-slider :model-value="proto.iosFontWeight ?? defaultIosFontWeight"
-                    @update:model-value="proto.iosFontWeight = $event" :min="100" :max="900" :step="100"
+                    @update:model-value="proto.iosFontWeight = $event" :min="100" :max="1000" :step="100"
                     size="small" />
                 </div>
               </template>
@@ -3648,19 +3657,19 @@ video {
     content: '';
     position: absolute;
     left: 50%;
-    width: 0.24em;
-    height: 0.24em;
+    width: 0.1em;
+    height: 0.09em;
     border-radius: 50%;
     background: currentColor;
     transform: translateX(-50%);
   }
 
   &::before {
-    top: 0.3em;
+    top: 0.28em;
   }
 
   &::after {
-    top: 0.66em;
+    top: 0.6em;
   }
 }
 
