@@ -4378,8 +4378,8 @@ video {
       }
 
       .component-one-large {
-        transform: scale(1.4);
-        transform-origin: top left;
+        transform: scale(1.15);
+        transform-origin: 50% 0%;
       }
 
       .component-two {
