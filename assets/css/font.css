@@ -12,3 +12,9 @@
     font-family: Monoton-Regular;
     src: url(../font/Monoton-Regular.ttf);
 }
+
+@font-face {
+    font-family: Sora-iOS26;
+    src: url(../font/Sora-Variable.ttf);
+    font-weight: 100 800;
+}

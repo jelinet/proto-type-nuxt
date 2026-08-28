@@ -2,10 +2,13 @@
 // definePageMeta({ layout: 'page' })
 import * as StackBlur from 'stackblur-canvas'
 import * as htmlToImage from 'html-to-image';
+import { Solar } from 'lunar-javascript'
 import {
   ref, computed
 } from 'vue';
 import { Check } from '@element-plus/icons-vue'
+import { Cropper, RectangleStencil } from 'vue-advanced-cropper'
+import 'vue-advanced-cropper/dist/style.css'
 
 const { awesome } = useAppConfig()
 
@@ -282,6 +285,102 @@ const handleChange = (uploadFile, uploadFiles, proto, index) => {
   if (autoUpdate.value) {
     backgroundUrl.value = proto.paperUrl
   }
+}
+
+const cropAspectRatio = 1290 / 2796
+const cropperVisible = ref(false)
+const cropperRef = ref(null)
+const cropSourceUrl = ref('')
+const cropRotation = ref(0)
+const cropperInstanceKey = ref(0)
+let cropTargetProto = null
+let cropTargetIndex = -1
+
+function openCropper(proto, index) {
+  cropTargetProto = proto
+  cropTargetIndex = index
+  cropSourceUrl.value = proto.paperUrl || paperUrl.value
+  cropRotation.value = 0
+  cropperInstanceKey.value++
+  cropperVisible.value = true
+}
+
+function closeCropper() {
+  cropperVisible.value = false
+  cropTargetProto = null
+  cropTargetIndex = -1
+}
+
+function onCropRotationInput(value) {
+  let delta = value - cropRotation.value
+  cropRotation.value = value
+  cropperRef.value && cropperRef.value.rotate(delta)
+}
+
+function cropFlipHorizontal() {
+  cropperRef.value && cropperRef.value.flip(true, false)
+}
+
+function cropFlipVertical() {
+  cropperRef.value && cropperRef.value.flip(false, true)
+}
+
+function resetCropper() {
+  cropRotation.value = 0
+  cropperRef.value && cropperRef.value.reset()
+}
+
+function getCroppedCanvas() {
+  let result = cropperRef.value && cropperRef.value.getResult()
+  let canvas = result && result.canvas
+  if (!canvas || !canvas.width || !canvas.height) return null
+  return canvas
+}
+
+function downloadCroppedImage() {
+  let canvas = getCroppedCanvas()
+  if (!canvas) return
+  canvas.toBlob((blob) => {
+    if (!blob) return
+    let url = URL.createObjectURL(blob)
+    let a = document.createElement('a')
+    a.href = url
+    a.download = 'cropped.png'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }, 'image/png')
+}
+
+function applyCrop() {
+  let canvas = getCroppedCanvas()
+  if (!canvas || !cropTargetProto) return
+  let proto = cropTargetProto
+  let index = cropTargetIndex
+
+  canvas.toBlob((blob) => {
+    if (!blob) return
+    let url = URL.createObjectURL(blob)
+
+    paperImage.value[index].onload = () => {
+      generateRecommendedGradientColors(index)
+      selectedGradient.value = recommendedGradients.value[0]
+
+      generateRecommendedBackgroundColors(index)
+      backgroundColor.value = recommendedBackgroundColor.value
+
+      applyAutoDateTimeColors()
+    }
+
+    proto.paperUrl = url
+
+    if (autoUpdate.value) {
+      backgroundUrl.value = proto.paperUrl
+    }
+
+    closeCropper()
+  }, 'image/png')
 }
 
 const batchUpload = ref(null)
@@ -1973,7 +2072,24 @@ const formatDateIntl = (date, locale) => {
   }).format(date)
 }
 
-let formatedDate = (date) => {
+const formatDateLunar = (date) => {
+  let solarPart = `${date.getMonth() + 1}月${date.getDate()}日周${formatXingQi(date.getDay())}`
+  let lunar = Solar.fromDate(date).getLunar()
+  return `${solarPart} · ${lunar.getYearInGanZhi()}年${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}`
+}
+
+const formatDateEnglish = (date) => {
+  return new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).format(date)
+}
+
+let formatedDate = (date, proto) => {
+  let dateFormat = proto?.dateFormat ?? 'solar'
+  if (dateFormat == 'lunar') {
+    return formatDateLunar(date)
+  } else if (dateFormat == 'english') {
+    return formatDateEnglish(date)
+  }
+
   if (locale.value == 'zh') {
     return `${date.getMonth() + 1}月${date.getDate()}日周${formatXingQi(date.getDay())}`
   } else {
@@ -2036,9 +2152,14 @@ const fontList = [
     label: t('mockup.multiLine'),
     value: 'Monoton-Regular',
   },
+  {
+    label: t('mockup.ios26'),
+    value: 'Sora-iOS26',
+  },
 ]
-let fontRadio = ref(fontList[0].value)
 
+const defaultIosFontHeight = 1
+const defaultIosFontWeight = 300
 function protoShadowEnabled(proto) {
   if (proto.shadow !== undefined) return proto.shadow
   let style = proto.style
@@ -2053,18 +2174,23 @@ function protoShadowFilter(proto) {
 }
 
 function timeStyle(proto) {
+  let fontRadio = proto.fontRadio ?? fontList[0].value
   let result = {
     'font-size': '110px',
     'line-height': 1,
-    color: proto.dateTimeColor,
-    'font-family': fontRadio.value,
+    color: proto.timeGlass ? 'rgba(255, 255, 255, 0.55)' : proto.dateTimeColor,
+    'font-family': fontRadio,
     'font-weight': proto.timeBold ? 'bold' : 'normal'
   }
 
-  if (fontRadio.value == 'Oswald-Stencil') {
+  if (fontRadio == 'Oswald-Stencil') {
     result = { ...result, ...{ transform: 'scaleY(0.7)' } }
-  } else if (fontRadio.value == 'Monoton-Regular') {
+  } else if (fontRadio == 'Monoton-Regular') {
     result = { ...result, ...{ transform: 'scaleY(0.7) scaleX(0.85)' } }
+  } else if (fontRadio == 'Sora-iOS26') {
+    let height = proto.iosFontHeight ?? defaultIosFontHeight
+    let weight = proto.iosFontWeight ?? defaultIosFontWeight
+    result = { ...result, ...{ transform: `scaleY(${height})`, 'font-weight': weight } }
   }
   return result;
 }
@@ -2319,7 +2445,7 @@ onMounted(() => {
                           <div
                             style="font-size: 10.5px;white-space: nowrap;line-height: 13px;margin-left: 6px;padding-bottom: .6px;"
                             :style="{ color: proto.systemColor }">
-                            {{ formatedDate(proto.selectedDate) }}
+                            {{ formatedDate(proto.selectedDate, proto) }}
                           </div>
                         </div>
 
@@ -2454,7 +2580,7 @@ onMounted(() => {
                           <div class="date" style="font-size: 22px;white-space: nowrap;"
                             :style="{ color: proto.dateTimeColor }">
                             {{
-                              formatedDate(proto.selectedDate) }}</div>
+                              formatedDate(proto.selectedDate, proto) }}</div>
                           <div class="time" :style="timeStyle(proto)">{{
                             proto.selectedTime.getHours() }}<span style="position: relative;top: -7.85714px;">:</span>{{
                               formatTimeMinutes(proto.selectedTime.getMinutes()) }}
@@ -2466,7 +2592,7 @@ onMounted(() => {
                           <div class="date" style="font-size: 22px;white-space: nowrap;"
                             :style="{ color: proto.dateTimeColor }">
                             {{
-                              formatedDate(proto.selectedDate) }}</div>
+                              formatedDate(proto.selectedDate, proto) }}</div>
                           <div class="time" :style="timeStyle(proto)">{{
                             proto.selectedTime.getHours() }}<span style="position: relative;top: -7.85714px;">:</span>{{
                               formatTimeMinutes(proto.selectedTime.getMinutes()) }}
@@ -2785,7 +2911,7 @@ onMounted(() => {
 
                     <template v-if="proto.screenType == 'lockScreen'">
                       <div class="date-time">
-                        <div class="date" :style="{ color: proto.dateTimeColor }">{{ formatedDate(proto.selectedDate) }}
+                        <div class="date" :style="{ color: proto.dateTimeColor }">{{ formatedDate(proto.selectedDate, proto) }}
                         </div>
                         <div class="time" :style="timeStyle(proto)">{{ proto.selectedTime.getHours() }}<span
                             style="position: relative;top: -7.85714px;">:</span>{{
@@ -2793,7 +2919,8 @@ onMounted(() => {
                         </div>
                       </div>
 
-                      <div v-if="(proto.componentRadio ?? 1) == 1" class="component-one">
+                      <div v-if="(proto.componentRadio ?? 1) == 1 || proto.componentRadio == 5" class="component-one"
+                        :class="{ 'component-one-large': proto.componentRadio == 5 }">
                         <svg width="328" height="70" viewBox="0 0 328 70" fill="none"
                           xmlns="http://www.w3.org/2000/svg">
                           <defs>
@@ -2918,6 +3045,56 @@ onMounted(() => {
                         </defs>
                       </svg>
 
+                      <svg class="component-three" v-if="proto.componentRadio == 3" width="336" height="72"
+                        viewBox="0 0 336 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M28 22 C 14 12, 4 18, 4 30 C 4 42, 16 50, 28 58 C 40 50, 52 42, 52 30
+                          C 52 18, 42 12, 28 22 Z" fill="none" :stroke="proto.dateTimeColor" stroke-width="2.5"
+                          stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M84 30 C 72 21, 63 26, 63 36 C 63 46, 74 53, 84 60 C 94 53, 105 46, 105 36
+                          C 105 26, 96 21, 84 30 Z" fill="none" :stroke="proto.dateTimeColor" stroke-width="2"
+                          stroke-linecap="round" stroke-linejoin="round"></path>
+                        <g :stroke="proto.dateTimeColor">
+                          <ellipse cx="182" cy="42" rx="30" ry="16" fill="none" stroke-width="2.5"></ellipse>
+                          <circle cx="157" cy="34" r="13" fill="none" stroke-width="2.5"></circle>
+                          <circle cx="180" cy="24" r="16" fill="none" stroke-width="2.5"></circle>
+                          <circle cx="203" cy="33" r="12" fill="none" stroke-width="2.5"></circle>
+                          <circle cx="172" cy="38" r="3" :fill="proto.dateTimeColor"></circle>
+                          <circle cx="192" cy="38" r="3" :fill="proto.dateTimeColor"></circle>
+                          <path d="M170 46 Q 182 54 194 46" fill="none" stroke-width="2.5"
+                            stroke-linecap="round"></path>
+                        </g>
+                      </svg>
+
+                      <svg class="component-four" v-if="proto.componentRadio == 4" width="336" height="72"
+                        viewBox="0 0 336 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="0" y="0" width="100" height="72" rx="20" fill="rgba(0,0,0,0.28)"></rect>
+                        <path d="M28 18 C 20 12, 10 16, 10 25 C 10 32, 16 36, 24 36 L 46 36 C 54 36, 60 31, 60 24
+                          C 60 16, 52 10, 44 14 C 41 9, 33 8, 28 18 Z" fill="none" :stroke="proto.dateTimeColor"
+                          stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <g :stroke="proto.dateTimeColor" stroke-width="2" stroke-linecap="round">
+                          <line x1="20" y1="46" x2="18" y2="52"></line>
+                          <line x1="30" y1="46" x2="28" y2="54"></line>
+                          <line x1="40" y1="46" x2="38" y2="52"></line>
+                        </g>
+                        <text x="10" y="65" font-size="11" font-weight="700" letter-spacing="1"
+                          :fill="proto.dateTimeColor">RAIN</text>
+                        <text x="46" y="65" font-size="10" opacity="0.75" :fill="proto.dateTimeColor">Today
+                          50%</text>
+
+                        <rect x="118" y="8" width="56" height="56" rx="28" fill="rgba(0,0,0,0.28)"></rect>
+                        <g :stroke="proto.dateTimeColor" stroke-width="2.5" stroke-linecap="round" fill="none">
+                          <path d="M146 24 A 12 12 0 0 1 158 36"></path>
+                          <path d="M146 30 A 6 6 0 0 1 152 36"></path>
+                        </g>
+                        <circle cx="146" cy="42" r="3" :fill="proto.dateTimeColor"></circle>
+
+                        <rect x="192" y="0" width="72" height="72" rx="20" fill="rgba(0,0,0,0.28)"></rect>
+                        <text x="228" y="26" font-size="12" font-weight="700" text-anchor="middle" opacity="0.85"
+                          :fill="proto.dateTimeColor">MON</text>
+                        <text x="228" y="56" font-size="28" font-weight="700" text-anchor="middle"
+                          :fill="proto.dateTimeColor">6</text>
+                      </svg>
+
                       <svg width="390" height="96" viewBox="0 0 390 96" fill="none" xmlns="http://www.w3.org/2000/svg"
                         style="position: absolute;top: 767px; left: 18px;">
                         <rect x="128" y="83" width="134" height="5" rx="2.5" :fill="proto.systemColor"></rect>
@@ -3010,12 +3187,29 @@ onMounted(() => {
               </template> -->
               </el-upload>
             </div>
+            <div class="crop-hint-row">
+              <span class="crop-hint-text">{{ t("mockup.recommendedSize") }}</span>
+              <el-button size="small" :disabled="!(proto.paperUrl || paperUrl)" @click="openCropper(proto, index)">
+                {{ t("mockup.crop") }}
+              </el-button>
+            </div>
             <div
               v-if="proto.screenType == 'lockScreen' || (proto.type == 'ipadType' && proto.screenType == 'desktopScreen')"
               class="date-setting">
               <div>{{ t("mockup.dateText") }}</div>
               <el-date-picker class="date-picker" :shortcuts="dateShortcuts" v-model="proto.selectedDate"
                 :placeholder="t('mockup.selectDateText')" size="default" format="MM-DD" :clearable="false" />
+            </div>
+            <div
+              v-if="proto.screenType == 'lockScreen' || (proto.type == 'ipadType' && proto.screenType == 'desktopScreen')"
+              class="component-setting">
+              <div>{{ t("mockup.dateFormat") }}</div>
+              <el-radio-group :model-value="proto.dateFormat ?? 'solar'"
+                @update:model-value="proto.dateFormat = $event">
+                <el-radio value="solar">{{ t("mockup.dateFormatSolar") }}</el-radio>
+                <el-radio value="lunar">{{ t("mockup.dateFormatLunar") }}</el-radio>
+                <el-radio value="english">{{ t("mockup.dateFormatEnglish") }}</el-radio>
+              </el-radio-group>
             </div>
 
             <template v-if="['lockScreen', 'desktopScreen', '聊天'].includes(proto.screenType)">
@@ -3032,9 +3226,30 @@ onMounted(() => {
 
               <div class="component-setting">
                 <div>{{ t("mockup.timeFont") }}</div>
-                <el-radio-group v-model="fontRadio">
+                <el-radio-group :model-value="proto.fontRadio ?? fontList[0].value"
+                  @update:model-value="proto.fontRadio = $event">
                   <el-radio :value="font.value" v-for="font in fontList">{{ font.label }}</el-radio>
                 </el-radio-group>
+              </div>
+
+              <template v-if="(proto.fontRadio ?? fontList[0].value) == 'Sora-iOS26'">
+                <div class="date-time-color-setting">
+                  <div>{{ t("mockup.fontHeight") }}</div>
+                  <el-slider :model-value="proto.iosFontHeight ?? defaultIosFontHeight"
+                    @update:model-value="proto.iosFontHeight = $event" :min="0.7" :max="1.5" :step="0.05"
+                    size="small" />
+                </div>
+                <div class="date-time-color-setting">
+                  <div>{{ t("mockup.fontWeight") }}</div>
+                  <el-slider :model-value="proto.iosFontWeight ?? defaultIosFontWeight"
+                    @update:model-value="proto.iosFontWeight = $event" :min="100" :max="800" :step="10"
+                    size="small" />
+                </div>
+              </template>
+
+              <div class="date-time-color-setting">
+                <div>{{ t("mockup.glassEffect") }}</div>
+                <el-checkbox :model-value="!!proto.timeGlass" @change="proto.timeGlass = $event" />
               </div>
             </template>
 
@@ -3072,10 +3287,14 @@ onMounted(() => {
                   <el-radio :value="0">{{ t("mockup.hide") }}</el-radio>
                   <el-radio :value="1">{{ t("mockup.widgetStyleOne") }}</el-radio>
                   <el-radio :value="2">{{ t("mockup.widgetStyleTwo") }}</el-radio>
+                  <el-radio :value="3">{{ t("mockup.widgetStyleThree") }}</el-radio>
+                  <el-radio :value="4">{{ t("mockup.widgetStyleFour") }}</el-radio>
+                  <el-radio :value="5">{{ t("mockup.widgetStyleFive") }}</el-radio>
                 </el-radio-group>
               </div>
 
-              <div v-if="proto.screenType == 'lockScreen' && (proto.componentRadio ?? 1) == 1" class="component-setting">
+              <div v-if="proto.screenType == 'lockScreen' && [1, 5].includes(proto.componentRadio ?? 1)"
+                class="component-setting">
                 <div>{{ t("mockup.widgetText") }}</div>
                 <el-input :model-value="proto.componentText" @input="proto.componentText = $event" style="width: 148px"
                   :placeholder="defaultComponentText" />
@@ -3365,6 +3584,34 @@ onMounted(() => {
         </div>
       </template>
     </el-dialog>
+
+    <el-dialog v-model="cropperVisible" :title="t('mockup.crop')" align-center :modal="true" width="fit-content"
+      @closed="closeCropper">
+      <div class="cropper-frame">
+        <cropper v-if="cropperVisible" :key="cropperInstanceKey" ref="cropperRef" class="cropper-instance"
+          :src="cropSourceUrl" :stencil-component="RectangleStencil"
+          :stencil-props="{ aspectRatio: cropAspectRatio, movable: false, resizable: false }"
+          image-restriction="stencil" />
+        <div class="crop-grid-overlay"></div>
+      </div>
+
+      <div class="crop-rotation-row">
+        <el-slider :model-value="cropRotation" :min="-180" :max="180" :step="1" size="small"
+          @input="onCropRotationInput" />
+      </div>
+
+      <template #footer>
+        <div class="dialog-footer crop-dialog-footer">
+          <el-button @click="cropFlipHorizontal">{{ t("mockup.flipHorizontal") }}</el-button>
+          <el-button @click="cropFlipVertical">{{ t("mockup.flipVertical") }}</el-button>
+          <div class="crop-dialog-footer-spacer"></div>
+          <el-button @click="downloadCroppedImage">{{ t("mockup.downloadCroppedImage") }}</el-button>
+          <el-button @click="resetCropper">{{ t("mockup.resetCrop") }}</el-button>
+          <el-button @click="closeCropper">{{ t("mockup.cancel") }}</el-button>
+          <el-button type="success" @click="applyCrop">{{ t("mockup.confirm") }}</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </ClientOnly>
 
 </template>
@@ -3386,6 +3633,50 @@ video {
     max-height: 50vh;
   }
 
+}
+
+.cropper-frame {
+  position: relative;
+  width: min(70vw, 320px);
+  aspect-ratio: 1290 / 2796;
+  margin: 0 auto;
+  background: #1d1d1d;
+  overflow: hidden;
+
+  .cropper-instance {
+    width: 100%;
+    height: 100%;
+  }
+
+  .crop-grid-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.6) 1px, transparent 1px),
+      linear-gradient(to right, rgba(255, 255, 255, 0.6) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.6) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.6) 1px, transparent 1px);
+    background-position: 33.333% 0, 66.666% 0, 0 33.333%, 0 66.666%;
+    background-size: 1px 100%, 1px 100%, 100% 1px, 100% 1px;
+    background-repeat: no-repeat;
+  }
+}
+
+.crop-rotation-row {
+  width: min(70vw, 320px);
+  margin: 12px auto 0;
+}
+
+.crop-dialog-footer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  .crop-dialog-footer-spacer {
+    flex: 1;
+  }
 }
 
 .dialogSubTitle {
@@ -3645,6 +3936,18 @@ video {
         :deep(.el-upload-dragger) {
           padding: 4px 16px;
         }
+      }
+    }
+
+    .crop-hint-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 8px;
+
+      .crop-hint-text {
+        font-size: 12px;
+        color: #909399;
       }
     }
 
@@ -4036,7 +4339,24 @@ video {
         }
       }
 
+      .component-one-large {
+        transform: scale(1.4);
+        transform-origin: top left;
+      }
+
       .component-two {
+        position: absolute;
+        top: 230px;
+        left: 49px;
+      }
+
+      .component-three {
+        position: absolute;
+        top: 230px;
+        left: 49px;
+      }
+
+      .component-four {
         position: absolute;
         top: 230px;
         left: 49px;
