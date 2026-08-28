@@ -47,6 +47,13 @@ export default defineNuxtConfig({
         resolvers: [ElementPlusResolver({ importStyle: false })]  // // importStyle: false  禁用自动导入样式,必须加这个，不然服务端会nodejs报错
       }),
     ],
+    server: {
+      watch: {
+        // .claude 下嵌套了完整的 git worktree 副本，不排除的话会被当成项目源码重复监听，
+        // 导致本地开发服务器轻易触发 EMFILE: too many open files
+        ignored: ['**/.claude/**'],
+      },
+    },
     // optimizeDeps: {
     //   include: ['@popperjs/core', 'element-plus']
     // }
