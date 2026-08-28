@@ -2624,7 +2624,7 @@ onMounted(() => {
                             {{
                               formatedDate(proto.selectedDate, proto) }}</div>
                           <div class="time" :style="timeStyle(proto)">{{
-                            proto.selectedTime.getHours() }}<span v-if="(proto.fontRadio ?? fontList[0].value) == 'RobotoFlex-iOS26'" class="ios26-colon"></span><span v-else style="position: relative;top: -7.85714px;">:</span>{{
+                            proto.selectedTime.getHours() }}<span v-if="(proto.fontRadio ?? fontList[0].value) == 'RobotoFlex-iOS26'">:</span><span v-else style="position: relative;top: -7.85714px;">:</span>{{
                               formatTimeMinutes(proto.selectedTime.getMinutes()) }}
                           </div>
                         </div>
@@ -2636,7 +2636,7 @@ onMounted(() => {
                             {{
                               formatedDate(proto.selectedDate, proto) }}</div>
                           <div class="time" :style="timeStyle(proto)">{{
-                            proto.selectedTime.getHours() }}<span v-if="(proto.fontRadio ?? fontList[0].value) == 'RobotoFlex-iOS26'" class="ios26-colon"></span><span v-else style="position: relative;top: -7.85714px;">:</span>{{
+                            proto.selectedTime.getHours() }}<span v-if="(proto.fontRadio ?? fontList[0].value) == 'RobotoFlex-iOS26'">:</span><span v-else style="position: relative;top: -7.85714px;">:</span>{{
                               formatTimeMinutes(proto.selectedTime.getMinutes()) }}
                           </div>
                         </div>
@@ -2956,9 +2956,8 @@ onMounted(() => {
                         <div class="date" :style="{ color: proto.dateTimeColor }">{{ formatedDate(proto.selectedDate, proto) }}
                         </div>
                         <div class="time" :style="timeStyle(proto)">{{ proto.selectedTime.getHours()
-                        }}<span v-if="(proto.fontRadio ?? fontList[0].value) == 'RobotoFlex-iOS26'"
-                            class="ios26-colon"></span><span v-else
-                            style="position: relative;top: -7.85714px;">:</span>{{
+                        }}<span v-if="(proto.fontRadio ?? fontList[0].value) == 'RobotoFlex-iOS26'">:</span><span
+                            v-else style="position: relative;top: -7.85714px;">:</span>{{
                               formatTimeMinutes(proto.selectedTime.getMinutes()) }}
                         </div>
                       </div>
@@ -3680,34 +3679,6 @@ video {
     max-height: 50vh;
   }
 
-}
-
-.ios26-colon {
-  position: relative;
-  display: inline-block;
-  width: 0.28em;
-  height: 1em;
-  vertical-align: top;
-
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    width: 0.1em;
-    height: 0.09em;
-    border-radius: 50%;
-    background: currentColor;
-    transform: translateX(-50%);
-  }
-
-  &::before {
-    top: 0.28em;
-  }
-
-  &::after {
-    top: 0.6em;
-  }
 }
 
 .cropper-frame {
