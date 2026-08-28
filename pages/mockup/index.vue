@@ -2158,9 +2158,41 @@ const fontList = [
   },
 ]
 
-const defaultIosFontHeight = 1.1
+const defaultIosFontHeight = 150
 const defaultIosFontWeight = 200
-const iosFontSize = 135
+
+// Sampled from the reference site's 字体高度 slider (min 60 / max 200): each step moves
+// font-size linearly, but the variable font's wdth/wght axes move non-linearly, so the
+// axis values are interpolated from real measured points rather than a formula.
+const iosHeightAxisTable = [
+  { v: 60, wdth: 103.202, wght: 584.571 },
+  { v: 62, wdth: 99.8041, wght: 580.914 },
+  { v: 80, wdth: 73.3, wght: 548 },
+  { v: 100, wdth: 63.7857, wght: 511.429 },
+  { v: 110, wdth: 59.0286, wght: 493.143 },
+  { v: 120, wdth: 54.2714, wght: 474.857 },
+  { v: 140, wdth: 44.7571, wght: 438.286 },
+  { v: 150, wdth: 40, wght: 420 },
+  { v: 160, wdth: 37.6429, wght: 411.714 },
+  { v: 178, wdth: 33.4, wght: 396.8 },
+  { v: 180, wdth: 32.9286, wght: 395.143 },
+  { v: 200, wdth: 28.2143, wght: 378.571 },
+]
+
+function iosHeightAxes(value) {
+  let table = iosHeightAxisTable
+  if (value <= table[0].v) return table[0]
+  if (value >= table[table.length - 1].v) return table[table.length - 1]
+  for (let i = 0; i < table.length - 1; i++) {
+    let a = table[i], b = table[i + 1]
+    if (value >= a.v && value <= b.v) {
+      let t = (value - a.v) / (b.v - a.v)
+      return { wdth: a.wdth + (b.wdth - a.wdth) * t, wght: a.wght + (b.wght - a.wght) * t }
+    }
+  }
+  return table[table.length - 1]
+}
+
 function protoShadowEnabled(proto) {
   if (proto.shadow !== undefined) return proto.shadow
   let style = proto.style
@@ -2191,12 +2223,14 @@ function timeStyle(proto) {
   } else if (fontRadio == 'RobotoFlex-iOS26') {
     let height = proto.iosFontHeight ?? defaultIosFontHeight
     let weight = proto.iosFontWeight ?? defaultIosFontWeight
+    let fontSize = (16 * height - 160) / 7
+    let axes = iosHeightAxes(height)
+    let grad = weight - 200
     result = {
       ...result, ...{
-        'font-size': `${iosFontSize}px`,
-        'font-stretch': '70%',
-        transform: `scaleY(${height})`,
-        'font-weight': weight
+        'font-size': `${fontSize}px`,
+        'font-weight': 400,
+        'font-variation-settings': `"GRAD" ${grad}, "XTRA" 460, "YTFI" 788, "opsz" 144, "wdth" ${axes.wdth}, "wght" ${axes.wght}`,
       }
     }
   }
@@ -2930,7 +2964,7 @@ onMounted(() => {
                       </div>
 
                       <div v-if="(proto.componentRadio ?? 1) == 1 || proto.componentRadio == 5" class="component-one"
-                        :class="{ 'component-one-large': proto.componentRadio == 5 }">
+                        :class="{ 'component-one-large': proto.componentRadio == 5, 'widget-shifted-down': (proto.fontRadio ?? fontList[0].value) == 'RobotoFlex-iOS26' }">
                         <svg width="328" height="70" viewBox="0 0 328 70" fill="none"
                           xmlns="http://www.w3.org/2000/svg">
                           <defs>
@@ -3007,7 +3041,8 @@ onMounted(() => {
                       </div>
 
                       <svg class="component-two" v-if="(proto.componentRadio ?? 1) == 2" width="336" height="72" viewBox="0 0 336 72"
-                        fill="none" xmlns="http://www.w3.org/2000/svg" style="top: 230px; left: 49px;">
+                        fill="none" xmlns="http://www.w3.org/2000/svg"
+                        :class="{ 'widget-shifted-down': (proto.fontRadio ?? fontList[0].value) == 'RobotoFlex-iOS26' }">
                         <g clip-path="url(#clip0_420_1695)">
                           <rect opacity="0.32" x="8" y="56" width="144" height="8" rx="4" :fill="proto.dateTimeColor">
                           </rect>
@@ -3056,7 +3091,8 @@ onMounted(() => {
                       </svg>
 
                       <svg class="component-three" v-if="proto.componentRadio == 3" width="336" height="72"
-                        viewBox="0 0 336 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        viewBox="0 0 336 72" fill="none" xmlns="http://www.w3.org/2000/svg"
+                        :class="{ 'widget-shifted-down': (proto.fontRadio ?? fontList[0].value) == 'RobotoFlex-iOS26' }">
                         <path d="M28 22 C 14 12, 4 18, 4 30 C 4 42, 16 50, 28 58 C 40 50, 52 42, 52 30
                           C 52 18, 42 12, 28 22 Z" fill="none" :stroke="proto.dateTimeColor" stroke-width="2.5"
                           stroke-linecap="round" stroke-linejoin="round"></path>
@@ -3076,7 +3112,8 @@ onMounted(() => {
                       </svg>
 
                       <svg class="component-four" v-if="proto.componentRadio == 4" width="336" height="72"
-                        viewBox="0 0 336 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        viewBox="0 0 336 72" fill="none" xmlns="http://www.w3.org/2000/svg"
+                        :class="{ 'widget-shifted-down': (proto.fontRadio ?? fontList[0].value) == 'RobotoFlex-iOS26' }">
                         <rect x="0" y="0" width="100" height="72" rx="20" fill="rgba(0,0,0,0.28)"></rect>
                         <path d="M28 18 C 20 12, 10 16, 10 25 C 10 32, 16 36, 24 36 L 46 36 C 54 36, 60 31, 60 24
                           C 60 16, 52 10, 44 14 C 41 9, 33 8, 28 18 Z" fill="none" :stroke="proto.dateTimeColor"
@@ -3246,13 +3283,13 @@ onMounted(() => {
                 <div class="date-time-color-setting">
                   <div>{{ t("mockup.fontHeight") }}</div>
                   <el-slider :model-value="proto.iosFontHeight ?? defaultIosFontHeight"
-                    @update:model-value="proto.iosFontHeight = $event" :min="0.7" :max="1.5" :step="0.05"
+                    @update:model-value="proto.iosFontHeight = $event" :min="60" :max="200" :step="1"
                     size="small" />
                 </div>
                 <div class="date-time-color-setting">
                   <div>{{ t("mockup.fontWeight") }}</div>
                   <el-slider :model-value="proto.iosFontWeight ?? defaultIosFontWeight"
-                    @update:model-value="proto.iosFontWeight = $event" :min="100" :max="1000" :step="100"
+                    @update:model-value="proto.iosFontWeight = $event" :min="0" :max="350" :step="1"
                     size="small" />
                 </div>
               </template>
@@ -4400,6 +4437,9 @@ video {
         left: 49px;
       }
 
+      .widget-shifted-down {
+        top: 680px;
+      }
 
     }
 
