@@ -4,6 +4,10 @@ import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 console.log("region:",process.env.region)
 export default defineNuxtConfig({
+  // .claude 下嵌套了完整的 git worktree 副本（含各自的 public/components 等目录），
+  // Nuxt 自身的 builder 监听器不认 vite.server.watch，得单独在这里排除，
+  // 否则文件监听数会被成倍放大，本地开发时很容易触发 EMFILE: too many open files
+  ignore: ['**/.claude/**'],
   modules: [
     '@nuxtjs/i18n',
     '@nuxtjs/tailwindcss',
