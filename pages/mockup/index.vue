@@ -312,9 +312,12 @@ function closeCropper() {
 }
 
 function onCropRotationInput(value) {
-  let delta = value - cropRotation.value
   cropRotation.value = value
-  cropperRef.value && cropperRef.value.rotate(delta)
+  if (!cropperRef.value) return
+  let result = cropperRef.value.getResult()
+  let currentRotation = result?.image?.transforms?.rotate ?? 0
+  let delta = value - currentRotation
+  if (delta) cropperRef.value.rotate(delta)
 }
 
 function cropFlipHorizontal() {
@@ -3636,9 +3639,8 @@ onMounted(() => {
       <div class="cropper-frame">
         <cropper v-if="cropperVisible" :key="cropperInstanceKey" ref="cropperRef" class="cropper-instance"
           :src="cropSourceUrl" :stencil-component="RectangleStencil"
-          :stencil-props="{ aspectRatio: cropAspectRatio, movable: false, resizable: false }"
-          image-restriction="stencil" />
-        <div class="crop-grid-overlay"></div>
+          :stencil-props="{ aspectRatio: cropAspectRatio, movable: true, resizable: true }"
+          image-restriction="none" :transitions="false" :debounce="false" />
       </div>
 
       <div class="crop-rotation-row">
@@ -3683,8 +3685,8 @@ video {
 
 .cropper-frame {
   position: relative;
-  width: min(70vw, 320px);
-  aspect-ratio: 1290 / 2796;
+  height: min(52vh, 460px);
+  width: calc(min(52vh, 460px) * 1290 / 2796);
   margin: 0 auto;
   background: #1d1d1d;
   overflow: hidden;
@@ -3693,24 +3695,10 @@ video {
     width: 100%;
     height: 100%;
   }
-
-  .crop-grid-overlay {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background-image:
-      linear-gradient(to right, rgba(255, 255, 255, 0.6) 1px, transparent 1px),
-      linear-gradient(to right, rgba(255, 255, 255, 0.6) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.6) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.6) 1px, transparent 1px);
-    background-position: 33.333% 0, 66.666% 0, 0 33.333%, 0 66.666%;
-    background-size: 1px 100%, 1px 100%, 100% 1px, 100% 1px;
-    background-repeat: no-repeat;
-  }
 }
 
 .crop-rotation-row {
-  width: min(70vw, 320px);
+  width: calc(min(52vh, 460px) * 1290 / 2796);
   margin: 12px auto 0;
 }
 
